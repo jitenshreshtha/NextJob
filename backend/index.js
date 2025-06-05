@@ -7,6 +7,9 @@ const bcrypt = require("bcrypt");
 const expressSession = require("express-session");
 const PostJob = require("./models/Job");
 
+
+// BACKEND_PORT = 5000
+// MONGO_URI = mongodb+srv://jitenshreshtha07:aqvFvCTiG7sxjDIi@cluster0.ljyr6jp.mongodb.net/NextJob?retryWrites=true&w=majority&appName=Cluster0
 const app = express();
 app.use(cors());
 app.use(express.json());
