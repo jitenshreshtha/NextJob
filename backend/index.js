@@ -8,14 +8,20 @@ const expressSession = require("express-session");
 const PostJob = require("./models/Job");
 
 
-// BACKEND_PORT = 5000
-// MONGO_URI = mongodb+srv://jitenshreshtha07:aqvFvCTiG7sxjDIi@cluster0.ljyr6jp.mongodb.net/NextJob?retryWrites=true&w=majority&appName=Cluster0
+
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 app.use(
   expressSession({
     secret: "newSession",
+    cookie: {
+      secure: false,
+      maxAge: 1000 * 60 * 60 * 24
+    }
   })
 );
 
@@ -24,9 +30,19 @@ mongoose
   .then(() => console.log("DB connected"))
   .catch((e) => console.log(e));
 
-app.get("/", (req, res) => {
-  res.send("Hello world");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello world");
+// });
+
+app.get('/checkSession', (req, res) => {
+  if (req.session.user) {
+    res.json({ loggedIn: true, user: req.session.user });
+  }
+  else {
+    res.json({ loggedIn: false })
+  }
+})
+
 
 app.post("/signup", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -77,6 +93,11 @@ app.get("/jobs", async (req, res) => {
   res.status(201).json(jobs);
 });
 
+app.post('/logout', (req, res) => {
+  req.session.destroy();
+  res.clearCookie('connect.sid');
+  res.status(200).json({ success: true, message: 'Logout sucessfull' })
+})
 app.listen(process.env.BACKEND_PORT, () => {
   console.log(`Server is running on port ${process.env.BACKEND_PORT}`);
 });
